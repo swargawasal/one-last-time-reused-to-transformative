@@ -1,0 +1,102 @@
+# ==================== CORE SETTINGS ====================
+# REQUIRED: Get your bot token from @BotFather on Telegram
+TELEGRAM_BOT_TOKEN=
+
+# REQUIRED: Get your API key from https://aistudio.google.com/app/apikey
+GEMINI_API_KEY=
+
+# ==================== DOWNLOADER & SOCIAL ====================
+# Optional: For Instagram downloads
+COOKIES_FILE=cookies.txt
+IG_USERNAME=
+IG_PASSWORD=
+
+# ==================== PERFORMANCE ====================
+CPU_MODE=auto
+GPU_MODE=auto
+REENCODE_PRESET=fast
+REENCODE_CRF=23
+
+# ==================== ENHANCEMENT ====================
+ENHANCEMENT_LEVEL=medium
+TARGET_RESOLUTION=1080:1920
+ENABLE_SKIN_PROTECT=yes
+SKIN_MAX_BRIGHTNESS=175
+
+# ==================== GEMINI ORCHESTRATOR ====================
+ENABLE_GEMINI_ENHANCE=yes
+GEMINI_MODEL=gemini-2.5-flash
+GEMINI_TIMEOUT=15
+GEMINI_MAX_RETRIES=2
+GEMINI_FAILOVER=yes
+
+# ORCHESTRATOR SETTINGS
+ENABLE_GEMINI_WATERMARK_DETECT=yes
+WATERMARK_MAX_AREA_PERCENT=15
+ENABLE_SMART_CROP=no
+FORCE_NO_CROP=yes
+
+# ==================== WATERMARK & CROP ====================
+
+# ==================== AUDIO REMIX ====================
+ENABLE_HEAVY_REMIX_SHORTS=no
+ENABLE_HEAVY_REMIX_COMPILATION=no
+AUTO_MUSIC=no
+MUSIC_VOLUME=0.4
+ORIGINAL_AUDIO_VOLUME=1.0
+
+# ==================== AI CAPTIONS (GEMINI) ====================
+AI_CAPTIONS=yes
+AI_CAPTION_STYLE=hotlook
+AI_CAPTION_TOPIC=hotnessoverloaded
+AI_CAPTION_PROMPT=
+# Optional: Override full prompt
+
+# ==================== WATERMARK DETECTION ====================
+WATERMARK_DETECT_TEXT=watermark,logo,text overlay
+WATERMARK_DETECT_LIST=
+
+# ==================== COMPILATION ====================
+COMPILATION_BATCH_SIZE=6  #/compile_last
+SEND_TO_YOUTUBE=off
+# YouTube OAuth (Required if SEND_TO_YOUTUBE=on)
+CLIENT_SECRET_FILE=client_secret.json
+YOUTUBE_TOKEN_FILE=token.json
+DEFAULT_HASHTAGS_SHORTS=#shorts #viral #trending
+DEFAULT_HASHTAGS_COMPILATION=#compilation #funny #viral
+ENABLE_COMPILATION_INTRO=yes
+
+# ==================== TRANSITIONS ====================
+TRANSITION_DURATION=0.5
+TRANSITION_INTERVAL=5
+FORCE_AUDIO_REMIX=yes
+# Auto-added by Smart Installer
+ADD_TEXT_OVERLAY=yes
+TEXT_OVERLAY_CONTENT="swargawasal"
+TEXT_OVERLAY_POSITION=bottom
+TEXT_OVERLAY_SIZE=60
+TEXT_OVERLAY_BOX=no
+# Auto-added by Smart Installer
+# ==================== ADVANCED PATHS ====================
+FFMPEG_BIN=ffmpeg
+FFPROBE_BIN=ffprobe
+
+# ==================== AI & ENGINE ====================
+FACE_ENHANCEMENT=yes
+USE_ADVANCED_ENGINE=off
+
+# ==================== TRANSFORMATIVE FEATURES ====================
+ADD_COLOR_GRADING=yes
+COLOR_FILTER=cinematic
+COLOR_INTENSITY=0.5
+
+ADD_SPEED_RAMPING=yes
+SPEED_VARIATION=0.15
+
+# ==================== WATERMARK DETAILS ====================
+ENABLE_WATERMARK_REMOVAL=yes
+ENABLE_WATERMARK_REPLACEMENT=yes
+WATERMARK_REPLACE_PATH=assets/watermark.png
+MY_WATERMARK_OPACITY=0.80
+MY_WATERMARK_TEXT="swargawasal"
+WATERMARK_2STEP_VERIFICATION=off
