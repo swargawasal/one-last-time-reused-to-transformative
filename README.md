@@ -10,35 +10,41 @@
 
 ## ✨ Key Features
 
-### 🧠 **Self-Learning Watermark System (NEW)**
+### 🧠 **Self-Learning Watermark System (Triple Refinement)**
 
-- **Hybrid Vision**: Combines **Google Gemini Vision** (Context) + **OpenCV ORB** (Precision) + **Machine Learning** (Validation).
-- **Dual-Memory Learning**: Maintains separate banks for **Positive** (Valid) and **Negative** (False Positive) templates.
-- **User Feedback Loop**: Learns from your Telegram commands:
-  - `/approve`: "This was a correct detection." (Learns Positive)
-  - `/reject`: "This was a mistake." (Learns Negative)
-- **Data-Driven ML**: Automatically trains a Random Forest classifier to predict watermark validity based on texture, geometry, and match confidence.
+- **Hybrid Vision Engine**: Combines **Google Gemini Vision** (Contextual Detection) + **OpenCV ORB** (Precise Tracking) + **Machine Learning** (Validation).
+- **Tri-Level Removal**:
+  - **Static Delogo**: For fixed logos (with specific time-range support).
+  - **Dynamic Masking**: For moving watermarks using trajectory tracking and clamp logic.
+  - **Drift Clamp**: Prevents mask from wandering off the watermark during motion.
+- **Feedback Loop**: Learns from your Telegram commands:
+  - `Yes` / `/approve`: "Correct detection." (Reinforces Positive Model)
+  - `No` / `/reject`: "Wrong detection." (Reinforces Negative Model & Triggers **Aggressive Retry**)
+
+### 🗣️ **AI Narrator & Voiceover (NEW)**
+
+- **AI Voiceover**: Automatically generates voiceovers from AI-generated captions or Gemini summaries.
+- **Smart Mixing**: Auto-ducks background music to ensure the voiceover is crisp and clear.
 
 ### 🎨 **Transformative Content Engine**
 
 - **Gemini AI Captions**: Generates viral-style captions, titles, and hashtags using Gemini 1.5 Flash.
 - **Smart Cropping**: Intelligent content-aware cropping for 9:16 vertical format.
 - **Dynamic Text Overlays**: Professional-grade text rendering with shadows and borders.
-- **Cinematic Color Grading**: Applies "Dark", "Vibrant", or "Cinematic" LUTs.
-- **Speed Ramping**: Dynamic speed variations to avoid copyright matching.
+- **Cinematic Color Grading**: Applies "Dark", "Vibrant", "Cinematic", "Warm", or "Cool" LUTs.
+- **Speed Ramping**: Dynamic speed variations (±15%) to avoid copyright matching.
 
 ### 🎵 **Advanced Audio Studio**
 
-- **Heavy Remixing**: Completely transforms audio structure using beat-aware slicing.
-- **Auto-Generated Music**: Creates unique, copyright-free background music on the fly.
+- **Heavy Remixing**: Completely transforms audio structure using beat-aware slicing for Shorts and Compilations.
+- **Auto-Generated Music**: Creates unique, copyright-free background music on the fly if no suitable tracks are found.
 - **Continuous Mixes**: Stitches multiple tracks from your library for long compilations.
-- **Voiceover Mixing**: Auto-ducks background music for AI voiceovers.
 
 ### 🚀 **Performance & Architecture**
 
 - **Smart Hardware Detection**: Auto-switches between NVENC (GPU) and libx264 (CPU).
-- **Fast Mode**: 10x faster processing for quick iterations.
-- **Batch Compilation**: Merges multiple processed clips with smart transitions (Fade, Wipe, Zoom).
+- **Batch Compilation**: Merges multiple processed clips with smart transitions (Fade, Wipe, Zoom, Slide).
+- **Incremental Renaming**: Ensures no files are overwritten (`_1`, `_2`, etc.).
 
 ---
 
@@ -48,29 +54,19 @@
 
 1. **Clone the repository:**
 
-   ```python
+   ```bash
    !git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
    %cd YOUR_REPO
    ```
 
-2. **Create `.env` file:**
+2. **Run installation:**
 
-   ```python
-   %%writefile .env
-   TELEGRAM_BOT_TOKEN=your_token_here
-   GEMINI_API_KEY=your_key_here
-   FAST_MODE=no
-   ENHANCEMENT_LEVEL=high
-   ```
-
-3. **Run installation:**
-
-   ```python
+   ```bash
    !python install_colab.py
    ```
 
-4. **Start the bot:**
-   ```python
+3. **Start the bot:**
+   ```bash
    !python main.py
    ```
 
@@ -89,19 +85,16 @@ GEMINI_API_KEY=your_key
 
 ```ini
 WATERMARK_DETECTION=yes
-WATERMARK_REMOVE=yes
+ENABLE_HYBRID_VISION=yes
 WATERMARK_DETECT_LIST=tiktok,reels,watermark,@  # Keywords for Gemini
-WATERMARK_MAX_AREA_PERCENT=20                   # Safety check
 ```
 
-### **Audio & Transformative**
+### **Audio & Voiceover**
 
 ```ini
-ENABLE_HEAVY_REMIX_SHORTS=yes       # Aggressive remixing for Shorts
-ENABLE_AUTO_MUSIC_GEN=yes           # Generate unique music if needed
-AI_CAPTIONS=yes                     # Use Gemini for captions
-ADD_COLOR_GRADING=yes
-ADD_SPEED_RAMPING=yes
+ENABLE_MICRO_VOICEOVER=yes      # Enable AI Voiceover
+ENABLE_HEAVY_REMIX_SHORTS=yes   # Aggressive remixing
+ENABLE_AUTO_MUSIC_GEN=yes       # Generate music if needed
 ```
 
 ---
@@ -110,21 +103,32 @@ ADD_SPEED_RAMPING=yes
 
 ### **Telegram Commands**
 
-- `/start` - Start the bot.
-- **Send Video/Link** - Process a single video.
-- **Reply `/approve`** - Confirm watermark removal (Learns **Positive**).
-- **Reply `/reject`** - Discard result (Learns **Negative** - False Positive).
-- `/compile_last <N>` - Compile the last N processed videos into a long video.
-- `/setbatch <N>` - Set auto-compilation threshold.
+| Command              | Description                                |
+| :------------------- | :----------------------------------------- |
+| `/start`             | Start the bot and get instructions.        |
+| `/setbatch <N>`      | Set auto-compilation threshold (e.g., 6).  |
+| `/getbatch`          | View current batch size.                   |
+| `/compile_last <N>`  | Compile the **latest** N processed videos. |
+| `/compile_first <N>` | Compile the **oldest** N processed videos. |
+| `/approve`           | Confirm upload to YouTube.                 |
+| `/reject`            | Discard video and delete file.             |
 
 ### **Workflow**
 
-1. **Send Video**: Bot downloads and analyzes.
-2. **Detection**: Gemini finds watermark -> OpenCV verifies.
-3. **Review**: Bot sends preview with "Watermark detected - verify removal".
-4. **Feedback**: You reply `/approve` or `/reject`.
-5. **Learning**: Bot updates its database (`watermark_templates/` and `watermark_dataset.csv`).
-6. **Upload**: If approved, bot uploads to YouTube (if configured).
+1. **Send Video**: Bot downloads (`downloader.py`) and analyzes metadata.
+2. **Processing**:
+   - **Enhancement**: Upscales and normalizes to 1080x1920.
+   - **Watermark**: Hybrid Vision detects and removes watermarks (Static or Dynamic).
+   - **Transform**: Applies Color Grading, Speed Ramping, and Text Overlays.
+   - **Audio**: Generates Voiceover (if enabled) and Remixes Audio.
+3. **Review**: Bot sends a preview to Telegram.
+   - _Message:_ "(Watermark detected - please verify removal- yes/no)"
+4. **Feedback**:
+   - Reply **`Yes`**: Confirms valid detection (Learns Positive).
+   - Reply **`No`**: Reports miss/error. Bot **automatically retries** with **Aggressive Mode**.
+5. **Finalize**:
+   - Reply **`/approve`**: Uploads to YouTube (if configured).
+   - Reply **`/reject`**: Deletes the video.
 
 ---
 
@@ -132,10 +136,11 @@ ADD_SPEED_RAMPING=yes
 
 ```
 ├── main.py                 # Bot entry point & Telegram handlers
-├── compiler.py             # Core video processing pipeline
+├── compiler.py             # Core video processing pipeline (The Brain)
 ├── watermark_auto.py       # Hybrid Vision orchestration
-├── opencv_watermark.py     # ORB + ML Learning Engine
+├── hybrid_watermark.py     # Advanced Watermark Logic (Drift Clamp, Trajectory)
 ├── gemini_captions.py      # AI Captioning & Vision
+├── voiceover.py            # AI Voiceover generation
 ├── audio_processing.py     # Remixing & Music Generation
 ├── ai_engine.py            # Upscaling (Real-ESRGAN/GFPGAN)
 ├── watermark_templates/    # Learned templates (Positive/Negative)
@@ -145,13 +150,12 @@ ADD_SPEED_RAMPING=yes
 
 ---
 
-## 📊 Performance Benchmarks
+## 📊 Performance
 
-| Hardware       | Mode       | Video (23s) | Processing Time |
-| -------------- | ---------- | ----------- | --------------- |
-| CPU (i7)       | FAST_MODE  | 23s         | ~30s            |
-| GPU (T4, 15GB) | AI (high)  | 23s         | ~30s ✅         |
-| GPU (T4, 15GB) | AI (ultra) | 23s         | ~1 min          |
+| Hardware              | Mode          | Video (23s) | Processing Time |
+| :-------------------- | :------------ | :---------- | :-------------- |
+| **Google Colab (T4)** | GPU (NVENC)   | 23s         | ~35s ✅         |
+| **CPU (Standard)**    | CPU (libx264) | 23s         | ~2-3 mins       |
 
 ---
 
