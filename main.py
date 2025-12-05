@@ -196,70 +196,33 @@ TRANSITION_INTERVAL=5
 
 def ensure_requirements_and_tools():
     """
-    Smart Installation System based on CPU/GPU modes.
+    Smart Startup Checks WITHOUT installing Python packages.
+    All pip installs are removed because Colab breaks when
+    main.py upgrades NumPy back to 2.x.
     """
     logger.info("🔧 Starting Smart Startup Checks...")
-    
-    # 0. Auto-Update .env
+
+    # 0. Update .env if missing
     check_and_update_env()
-    
-    # 1. Resolve Compute Mode
+
+    # 1. Determine compute mode (GPU vs CPU)
     mode = resolve_compute_mode()
-    os.environ["COMPUTE_MODE"] = mode # Set for other scripts
-    
+    os.environ["COMPUTE_MODE"] = mode
+
     logger.info(f"⚡ FINAL COMPUTE MODE: {mode.upper()}")
-    
-    # 2. Smart Dependency Installation
-    if mode == "cpu":
-        logger.info("⚡ CPU Mode selected. Installing lightweight dependencies only...")
-        lightweight_deps = ["python-telegram-bot", "python-dotenv", "requests", "google-generativeai", "yt-dlp"]
-        try:
-            for dep in lightweight_deps:
-                subprocess.check_call([sys.executable, "-m", "pip", "install", dep, "-q"], 
-                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except:
-            pass
-    else:
-        # GPU Mode
-        logger.info("🎮 GPU Mode selected. Installing full AI dependencies...")
-        
-        # 1. Install Core Requirements first
-        if os.path.exists("requirements.txt"):
-            try:
-                subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt", "-q"], 
-                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            except Exception as e:
-                logger.error(f"❌ Failed to install core requirements: {e}")
 
-        # 2. Auto-Install AI Libraries (Torch, RealESRGAN, YOLO)
-        ai_libs = [
-            "torch==2.2.2", "torchvision==0.17.2", "torchaudio==2.2.2",
-            "realesrgan==0.3.0", "gfpgan==1.3.8", "basicsr==1.4.2", 
-            "facexlib==0.3.0", "ultralytics"
-        ]
-        
-        logger.info("📦 Checking/Installing AI Libraries...")
-        for lib in ai_libs:
-            try:
-                # Check if installed (simple check)
-                pkg_name = lib.split("==")[0]
-                subprocess.check_call([sys.executable, "-m", "pip", "show", pkg_name], 
-                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            except subprocess.CalledProcessError:
-                logger.info(f"   ⬇️ Installing {lib}...")
-                try:
-                    subprocess.check_call([sys.executable, "-m", "pip", "install", lib, "-q"], 
-                                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                except Exception as e:
-                    logger.warning(f"   ⚠️ Failed to install {lib}: {e}")
+    # 2. DO NOT INSTALL ANY PACKAGES HERE
+    #    All packages MUST be installed in install_colab.py ONLY.
 
-        # Install AI tools
-        try:
-            logger.info("🔧 Checking AI Models & Tools...")
-            subprocess.check_call([sys.executable, "tools-install.py"])
-        except Exception as e:
-            logger.error(f"❌ Tools installation failed: {e}")
-        
+    logger.info("📦 Skipping Python package installations (handled by install_colab.py)")
+
+    # 3. Install models only (safe)
+    try:
+        logger.info("🔧 Checking AI Models & Tools...")
+        subprocess.check_call([sys.executable, "tools-install.py"])
+    except Exception as e:
+        logger.error(f"⚠️ Tools-install failed: {e}")
+
     logger.info("✅ Startup checks complete.")
 
 # Run setup BEFORE imports that might need them
